@@ -2,8 +2,9 @@ package com.habbatul.challange4;
 
 import com.habbatul.challange4.entity.Merchant;
 import com.habbatul.challange4.enums.MerchantStatus;
-import com.habbatul.challange4.exception.CustomException;
-import com.habbatul.challange4.model.MerchantResponse;
+import com.habbatul.challange4.model.requests.CreateMerchantRequest;
+import com.habbatul.challange4.model.requests.UpdateMerchantRequest;
+import com.habbatul.challange4.model.responses.MerchantResponse;
 import com.habbatul.challange4.repository.MerchantRepository;
 import com.habbatul.challange4.service.MerchantService;
 import org.junit.jupiter.api.AfterEach;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -35,7 +37,7 @@ class MerchantServiceTest {
 
     @Test
     void testAddMerchant() {
-        Merchant merchant = Merchant.builder()
+        CreateMerchantRequest merchant = CreateMerchantRequest.builder()
                 .merchantName("TestMerchant")
                 .merchantLocation("TestLocation")
                 .open(MerchantStatus.OPEN)
@@ -57,13 +59,13 @@ class MerchantServiceTest {
                 .open(MerchantStatus.OPEN)
                 .build();
         merchantRepository.save(merchant);
-        Merchant merchant2 = Merchant.builder()
+        CreateMerchantRequest merchant2 = CreateMerchantRequest.builder()
                 .merchantName("TestMerchant")
                 .merchantLocation("TestLocation")
                 .open(MerchantStatus.OPEN)
                 .build();
 
-        assertThrows(CustomException.class, () -> merchantService.addMerchant(merchant2));
+        assertThrows(ResponseStatusException.class, () -> merchantService.addMerchant(merchant2));
     }
 
     @Test
@@ -72,14 +74,16 @@ class MerchantServiceTest {
         Merchant merchant = Merchant.builder()
                 .merchantName("TestMerchant")
                 .merchantLocation("TestLocation")
-                .open(MerchantStatus.OPEN)
+                .open(MerchantStatus.CLOSED)
                 .build();
         merchantRepository.save(merchant);
 
         // Change merchant status
-        merchant.setOpen(MerchantStatus.OPEN);
+        UpdateMerchantRequest merchantReq = UpdateMerchantRequest.builder()
+                .open(MerchantStatus.OPEN)
+                .build();
 
-        MerchantResponse response = merchantService.editStatus(merchant);
+        MerchantResponse response = merchantService.editStatus(merchant.getMerchantName() ,merchantReq);
 
         assertNotNull(response);
         assertEquals("OPEN", response.getOpen());
@@ -87,11 +91,11 @@ class MerchantServiceTest {
 
     @Test
     void testEditNotFound() {
-        Merchant merchant = Merchant.builder()
-                .merchantCode("KESALAHAN")
+        UpdateMerchantRequest merchant = UpdateMerchantRequest.builder()
                 .build();
+        String merchantName = "ERROR";
 
-        assertThrows(CustomException.class, () -> merchantService.editStatus(merchant));
+        assertThrows(ResponseStatusException.class, () -> merchantService.editStatus(merchantName, merchant));
     }
 
 
@@ -128,7 +132,7 @@ class MerchantServiceTest {
                 .build();
         merchantRepository.save(closedMerchant);
 
-        assertThrows(CustomException.class, () -> merchantService.showOpenMerchant());
+        assertThrows(ResponseStatusException.class, () -> merchantService.showOpenMerchant());
     }
 
 }

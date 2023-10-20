@@ -1,13 +1,14 @@
 package com.habbatul.challange4.service;
 
-import com.habbatul.challange4.entity.Merchant;
-import com.habbatul.challange4.model.MerchantResponse;
+import com.habbatul.challange4.model.requests.CreateMerchantRequest;
+import com.habbatul.challange4.model.requests.UpdateMerchantRequest;
+import com.habbatul.challange4.model.responses.MerchantResponse;
 
 import java.util.List;
 
 public interface MerchantService {
-    MerchantResponse addMerchant(Merchant merchant);
-    MerchantResponse editStatus(Merchant merchant);
+    MerchantResponse addMerchant(CreateMerchantRequest createMerchantRequest);
+    MerchantResponse editStatus(String merchantName, UpdateMerchantRequest updateMerchantRequest);
 
     List<MerchantResponse> showOpenMerchant();
 }

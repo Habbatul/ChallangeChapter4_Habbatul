@@ -1,6 +1,7 @@
-package com.habbatul.challange4.model;
+package com.habbatul.challange4.model.responses;
 
 
+import com.habbatul.challange4.enums.MerchantStatus;
 import lombok.*;
 
 @Getter
@@ -9,5 +10,5 @@ import lombok.*;
 public class MerchantResponse {
     private String merchantName;
     private String merchantLocation;
-    private String open;
+    private MerchantStatus open;
 }

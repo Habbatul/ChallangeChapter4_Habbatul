@@ -1,8 +1,9 @@
 package com.habbatul.challange4;
 
 import com.habbatul.challange4.entity.User;
-import com.habbatul.challange4.exception.CustomException;
-import com.habbatul.challange4.model.UserResponse;
+import com.habbatul.challange4.model.requests.CreateUserRequest;
+import com.habbatul.challange4.model.requests.UpdateUserRequest;
+import com.habbatul.challange4.model.responses.UserResponse;
 import com.habbatul.challange4.repository.UserRepository;
 import com.habbatul.challange4.service.UserService;
 import org.junit.jupiter.api.AfterEach;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +33,7 @@ class UserServiceTest {
 
     @Test
     void testAddUser() {
-        User user = User.builder()
+        CreateUserRequest user = CreateUserRequest.builder()
                 .emailAddress("test@contoh.com")
                 .username("testusername")
                 .password("testpassword")
@@ -47,7 +48,7 @@ class UserServiceTest {
         assertEquals("testpassword", response.getPassword());
 
         //Cek apakah pada db hasilnya sama
-        User savedUser = userRepository.findById(user.getUserId()).orElse(null);
+        User savedUser = userRepository.findUserByUsername(user.getUsername()).orElse(null);
         assertEquals("test@contoh.com", savedUser.getEmailAddress());
         assertEquals("testusername", savedUser.getUsername());
         assertEquals("testpassword", savedUser.getPassword());
@@ -62,14 +63,14 @@ class UserServiceTest {
                 .build();
         userRepository.save(user);
 
-        User user2 = User.builder()
+        CreateUserRequest user2 = CreateUserRequest.builder()
                 .emailAddress("test@contoh.com")
                 .username("testusername")
                 .password("testpassword")
                 .build();
         //service untuk menambahkan
 
-        assertThrows(CustomException.class, ()->userService.addUser(user2));
+        assertThrows(ResponseStatusException.class, ()->userService.addUser(user2));
     }
 
 
@@ -85,8 +86,13 @@ class UserServiceTest {
         //pengubahan setelah user disimpan ke db
         user.setEmailAddress("update@contoh.com");
 
+        UpdateUserRequest user2 = UpdateUserRequest.builder()
+                .emailAddress(user.getEmailAddress())
+                .password(user.getPassword())
+                .build();
+
         //service untuk update
-        UserResponse response = userService.updateUser(user);
+        UserResponse response = userService.updateUser(user.getUsername(), user2);
 
         //cek apakah email berhasil diganti menjadi email yang diupdate
         assertEquals("update@contoh.com", response.getEmailAddress());
@@ -99,12 +105,12 @@ class UserServiceTest {
 
     @Test
     void testUpdateUserNotFound() {
-        User user = User.builder()
-                .userId(999L) //masukin id yang ga ada
+        UpdateUserRequest user = UpdateUserRequest.builder()
                 .build();
+        String username ="ERROR";
 
         //cek apakah exception berjalan
-        assertThrows(CustomException.class, () -> userService.updateUser(user));
+        assertThrows(ResponseStatusException.class, () -> userService.updateUser(username, user));
     }
 
 
@@ -117,8 +123,9 @@ class UserServiceTest {
                 .build();
         userRepository.save(user);
 
+
         //menghapus user yang sudah disimpan
-        userService.deleteUser(user);
+        userService.deleteUser(user.getUsername());
 
         //cek bahwa pada db data telah terhapus
         User deletedUser = userRepository.findById(user.getUserId()).orElse(null);
@@ -128,11 +135,11 @@ class UserServiceTest {
 
     @Test
     void testDeleteUserNotFound() {
-        User user = User.builder()
-                .userId(999L) //masukin id yang ga ada
+        CreateUserRequest user = CreateUserRequest.builder()
+                .username("0000")//masukin id yang ga ada
                 .build();
 
-        assertThrows(CustomException.class, () -> userService.deleteUser(user));
+        assertThrows(ResponseStatusException.class, () -> userService.deleteUser(user.getUsername()));
     }
 
 }

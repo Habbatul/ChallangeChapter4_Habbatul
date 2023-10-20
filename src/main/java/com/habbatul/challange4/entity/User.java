@@ -3,6 +3,7 @@ package com.habbatul.challange4.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,4 +24,9 @@ public class User {
     private String emailAddress;
 
     private String password;
+
+    //untuk proses bisnis sementara pesan cascade = CascadeType.REMOVE ke orderDetail
+    //karena order masih ambigu, apakah order yang completed akan menjadi log history atau tidak
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Order> order;
 }

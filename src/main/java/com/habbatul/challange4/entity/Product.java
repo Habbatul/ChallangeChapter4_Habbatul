@@ -5,9 +5,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -27,7 +27,12 @@ public class Product {
 
     private LocalDateTime addedTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_code")
     private Merchant merchant;
+
+    //untuk proses bisnis sementara pesan cascade = CascadeType.REMOVE ke orderDetail
+    //karena order masih ambigu, apakah order yang completed akan menjadi log history atau tidak
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<OrderDetail> orderDetail;
 }

@@ -1,4 +1,4 @@
-package com.habbatul.challange4.model;
+package com.habbatul.challange4.model.responses;
 
 import lombok.*;
 
@@ -6,6 +6,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ProductResponse {
+    private String productCode;
     private String productName;
     private double price;
     private String merchantName;
