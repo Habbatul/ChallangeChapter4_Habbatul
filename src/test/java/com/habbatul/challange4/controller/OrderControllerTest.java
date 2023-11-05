@@ -112,10 +112,8 @@ public class OrderControllerTest {
 
     @Test
     public void testGetUserOrders() throws Exception {
-        // Buat token untuk otorisasi
         String token = loginFirst();
 
-        // Simulasikan data yang akan dikembalikan oleh orderService
         List<OrderResponse> orderResponses = new ArrayList<>();
 
         when(authExtractor.extractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
@@ -130,7 +128,6 @@ public class OrderControllerTest {
 
     @Test
     public void testMakeOrder() throws Exception {
-        // Buat token untuk otorisasi
         String token = loginFirst();
 
         //pakai byte kosong karena emang ga ada filenya

@@ -56,10 +56,8 @@ public class UserControllerTest {
     //cek hak akses nya sepertinya ada salah masalahnya tanpa authentikasi bisa jalan
     @Test
     public void testAddUser() throws Exception {
-        // Buat token untuk otorisasi
         String token = loginFirst();
 
-        // Simulasikan data yang akan dikembalikan oleh userService
         UserResponse userResponse = UserResponse.builder()
                 .username("newuser")
                 .emailAddress("newuser@example.com")
@@ -83,10 +81,8 @@ public class UserControllerTest {
 
     @Test
     public void testUpdateUser() throws Exception {
-        // Buat token untuk otorisasi
         String token = loginFirst();
 
-        // Simulasikan data yang akan dikembalikan oleh userService
         UserResponse userResponse = UserResponse.builder()
                 .username("newuser")
                 .emailAddress("newuser@example.com")
@@ -110,7 +106,6 @@ public class UserControllerTest {
 
     @Test
     public void testDeleteUser() throws Exception {
-        // Buat token untuk otorisasi
         String token = loginFirst();
 
         when(authExtractor.extractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");

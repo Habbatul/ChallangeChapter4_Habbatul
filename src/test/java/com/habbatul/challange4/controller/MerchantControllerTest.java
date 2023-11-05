@@ -88,18 +88,14 @@ public class MerchantControllerTest {
 
     @Test
     public void testEditMerchant() throws Exception {
-        // Membuat token dengan role MERCHANT
         String token = loginFirst();
 
-        // Simulasikan data yang akan dikembalikan oleh merchantService
         MerchantResponse merchantResponse = new MerchantResponse("Merchant1", "Example alamat", MerchantStatus.OPEN);
-        // Set data merchant yang diharapkan
 
         when(merchantService.editStatus(Mockito.anyString(), Mockito.any(UpdateMerchantRequest.class)))
                 .thenReturn(merchantResponse);
 
         UpdateMerchantRequest updateMerchantRequest = new UpdateMerchantRequest();
-        // Set data updateMerchantRequest sesuai kebutuhan
 
         mockMvc.perform(MockMvcRequestBuilders.put("/merchant/merchantName")
                         .header("Authorization","Bearer " + token)
