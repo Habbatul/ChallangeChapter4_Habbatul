@@ -12,5 +12,3 @@
 ### - Desain ERD (belum terwujud pada entity)
 <img src="erd_new.png">
 
-### - Hasil unit test berhasil mencapai coverage 100% untuk case negatif dan positif
-<img src="hasil_unittest.png">
