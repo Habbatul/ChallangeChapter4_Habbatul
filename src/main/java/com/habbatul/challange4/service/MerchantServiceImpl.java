@@ -2,12 +2,15 @@ package com.habbatul.challange4.service;
 
 import com.habbatul.challange4.entity.Merchant;
 import com.habbatul.challange4.enums.MerchantStatus;
-import com.habbatul.challange4.exception.CustomException;
-import com.habbatul.challange4.model.MerchantResponse;
+import com.habbatul.challange4.model.requests.CreateMerchantRequest;
+import com.habbatul.challange4.model.requests.UpdateMerchantRequest;
+import com.habbatul.challange4.model.responses.MerchantResponse;
 import com.habbatul.challange4.repository.MerchantRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,11 +18,19 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class MerchantServiceImpl implements MerchantService {
+
     @Autowired
-    MerchantRepository merchantRepository;
+    private MerchantRepository merchantRepository;
 
     @Override
-    public MerchantResponse addMerchant(Merchant merchant) {
+    public MerchantResponse addMerchant(CreateMerchantRequest createMerchantRequest) {
+        //process request
+        Merchant merchant = Merchant.builder()
+                .merchantName(createMerchantRequest.getMerchantName())
+                .merchantLocation(createMerchantRequest.getMerchantLocation())
+                .open(createMerchantRequest.getOpen())
+                .build();
+
         log.debug("Service addMerchant dijalankan");
         if (!merchantRepository.existsByMerchantName(merchant.getMerchantName())) {
             merchantRepository.save(merchant);
@@ -28,7 +39,7 @@ public class MerchantServiceImpl implements MerchantService {
             return merchantResponses.get(0);
         } else {
             log.error("Merchant sudah ada : {}", merchant.getMerchantName());
-            throw new CustomException("Merchant is exist!!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Merchant sudah didaftarkan sebelumnya");
         }
     }
 
@@ -38,15 +49,20 @@ public class MerchantServiceImpl implements MerchantService {
                 .map(merchants -> MerchantResponse.builder()
                         .merchantName(merchants.getMerchantName())
                         .merchantLocation(merchants.getMerchantLocation())
-                        .open(merchants.getOpen().toString())
+                        .open(merchants.getOpen())
                         .build()
                 ).collect(Collectors.toList());
     }
 
     @Override
-    public MerchantResponse editStatus(Merchant merchant) {
+    public MerchantResponse editStatus(String merchantName, UpdateMerchantRequest updateMerchantRequest) {
+        //process request
+        Merchant merchant = new Merchant();
+        merchant.setMerchantName(merchantName);
+        merchant.setOpen(updateMerchantRequest.getOpen());
+
         log.debug("Service editStatus merchant dijalankan");
-        Optional<Merchant> merchantByID = merchantRepository.findById(merchant.getMerchantCode());
+        Optional<Merchant> merchantByID = merchantRepository.findByMerchantName(merchant.getMerchantName());
         if (merchantByID.isPresent()) {
             Merchant oldMerchant = merchantByID.get();
             oldMerchant.setOpen(merchant.getOpen() != null ? merchant.getOpen() : oldMerchant.getOpen());
@@ -57,7 +73,7 @@ public class MerchantServiceImpl implements MerchantService {
             return merchantResponses.get(0);
         } else {
             log.error("Merchant tidak ditemukan");
-            throw new CustomException("Merchant Not found");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Merchant tidak ditemukan");
         }
 
     }
@@ -72,7 +88,7 @@ public class MerchantServiceImpl implements MerchantService {
             return toMerchantResponse(merchants);
         } else {
             log.error("Merchant Kosong");
-            throw new CustomException("Merchant tidak ditemukan");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Merchant tidak ditemukan");
         }
 
     }

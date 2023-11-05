@@ -28,10 +28,10 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatus completed;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<OrderDetail> orderDetails;
 }

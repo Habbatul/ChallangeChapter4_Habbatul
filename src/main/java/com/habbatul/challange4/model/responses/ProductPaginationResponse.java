@@ -1,4 +1,4 @@
-package com.habbatul.challange4.model;
+package com.habbatul.challange4.model.responses;
 
 import lombok.*;
 

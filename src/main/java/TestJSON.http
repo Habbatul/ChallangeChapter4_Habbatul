@@ -1,0 +1,113 @@
+### Menampilkan merchant yang sedang buka
+GET http://localhost:8080/merchant
+
+### Menambahkan merchant
+POST http://localhost:8080/merchant
+Content-Type: application/json
+
+{
+  "merchantName": "merchant1",
+  "merchantLocation": "Jalan Kenangan",
+  "open": "CLOSED"
+}
+
+<> 2023-10-11T005557.201.json
+
+### Edit status merchant buka/tutup
+PUT http://localhost:8080/merchant/merchant1
+Content-Type: application/json
+
+{
+  "open": "OPEN"
+}
+
+<> 2023-10-11T005757.201.json
+<> 2023-10-11T005611.201.json
+
+### Menambahkan user
+POST http://localhost:8080/user
+Content-Type: application/json
+
+{
+  "username": "user1",
+  "emailAddress": "mamam@mamam.com",
+  "password": "ikanduyung"
+}
+
+### Mengupdate user
+PUT http://localhost:8080/user/user1
+Content-Type: application/json
+
+{
+"emailAddress": "user@user1",
+"password": "user1"
+}
+
+### Menghapus user
+DELETE http://localhost:8080/user/user1
+Content-Type: application/json
+
+
+### Menambahkan produk baru
+POST http://localhost:8080/product
+Content-Type: application/json
+
+{
+  "productName": "barang3",
+  "merchantName": "merchant1",
+  "price": 5000
+}
+
+### Mengupdate detail produk
+PUT http://localhost:8080/product/9b3403f7-31ce-42a6-af65-6fcd11d72ebc
+Content-Type: application/json
+
+{
+  "productName": "barang1",
+  "merchantName": "merchant1",
+  "price": 9000
+}
+
+### Menghapus produk
+DELETE http://localhost:8080/product/9b3403f7-31ce-42a6-af65-6fcd11d72ebc
+
+### Menampilkan produk yang tersedia (dengan pagination)
+GET http://localhost:8080/product?page=5
+
+### Membuat pesanan
+POST http://localhost:8080/order/
+Content-Type: application/json
+username: user1
+
+{
+  "destinationAddress": "Magelang, Mertoyudan, Kalinegoro",
+  "completed": "INCOMPLETE",
+  "detailOrder": [
+    {
+      "quantity": 3,
+      "productName": "barang1"
+    },
+    {
+      "quantity": 2,
+      "totalPrice": 10000.0,
+      "productName": "barang2"
+    },
+    {
+      "quantity": 3,
+      "totalPrice": 15000.0,
+      "productName": "barang3"
+    }
+  ]
+}
+
+### Menampilkan semua pesanan
+GET http://localhost:8080/order/admin
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzYW1hd2EiLCJpYXQiOjE2OTg2OTQ2ODgsImV4cCI6MTY5ODcxMjY4OH0.BJT_Tl_VqCARv5ZkEn2nlvDZCE7EI-3zdx5Gm57B9dPwCYf_rUY4FlR8YQ9eaABEOPV7ouMT3JAYlcCd0I79Lw
+
+### Menampilkan pesanan
+GET http://localhost:8080/order/
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzYW1hd2EiLCJpYXQiOjE2OTg2OTQ2ODgsImV4cCI6MTY5ODcxMjY4OH0.BJT_Tl_VqCARv5ZkEn2nlvDZCE7EI-3zdx5Gm57B9dPwCYf_rUY4FlR8YQ9eaABEOPV7ouMT3JAYlcCd0I79Lw
+
+### Print Order
+POST http://localhost:8080/order/print/
+username: user1

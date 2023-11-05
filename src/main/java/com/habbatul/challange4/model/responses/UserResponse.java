@@ -1,4 +1,4 @@
-package com.habbatul.challange4.model;
+package com.habbatul.challange4.model.responses;
 
 import lombok.*;
 
@@ -8,5 +8,4 @@ import lombok.*;
 public class UserResponse {
     private String username;
     private String emailAddress;
-    private String password;
 }
