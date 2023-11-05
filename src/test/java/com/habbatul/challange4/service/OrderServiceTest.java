@@ -299,6 +299,8 @@ class OrderServiceTest {
         when(orderRepository.findOrdersAll()).thenReturn(Collections.emptyList());
 
         assertThrows(ResponseStatusException.class, () -> orderService.getOrderAll());
+
+        verify(orderRepository, times(1)).findOrdersAll();
     }
 
     //uji coba untuk printpdf

@@ -37,10 +37,10 @@ public class WebConfiguration implements WebMvcConfigurer {
         return new OpenAPI()
                 .info(new Info()
                         .title("BinarFud OPEN API")
-                        .description("<b style=color:red;>Ketika POST /auth/signin maka akan menggenerate cookies, sehingga " +
+                        .description("<b>Ketika POST /auth/signin maka akan menggenerate cookies, sehingga " +
                                 "langsung bisa hit endpoint yang diinginkan sesuai hak aksesnya, tapi bisa " +
                                 "juga menggunakan authentication dengan skema openapi dengan menekan tombol " +
-                                "Authorize (Bisa dicoba dengan menghapus cookies pada browser terlebih dahulu).</b><br>" +
+                                "Authorize (Bisa dicoba dengan menghapus cookies pada browser terlebih dahulu).</b><br><br>" +
                                 "Rest API ini dibuat dalam rangka menyelesaikan challenge " +
                                 "chapter 5. Selain kembalian dalam bentuk JSON, terdapat juga fitur " +
                                 "endpoint untuk menghasilkan bentuk file PDF yang estetik dengan Jasper." +

@@ -99,6 +99,7 @@ public class JwtUtilTest {
 
         String token = jwtUtil.extractToken(request);
 
+        //cek isian token dari cookie
         assertEquals("testCookieToken", token);
     }
 
@@ -111,6 +112,7 @@ public class JwtUtilTest {
 
         String token = jwtUtil.extractToken(request);
 
+        //cek isian token dari header
         assertEquals("testHeaderToken", token);
     }
 
