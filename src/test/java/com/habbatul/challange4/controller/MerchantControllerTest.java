@@ -118,11 +118,6 @@ public class MerchantControllerTest {
         mySet.add(Roles.builder().roleName(ERole.MERCHANT).build());
         user.setRoles(mySet);
 
-        //buat repository mock nya
-        when(userRepository.save(user)).thenReturn(user);
-        //simpan user sehingga mendapat role
-        userRepository.save(user);
-
         when(userRepository.findUserByUsername(Mockito.anyString())).thenReturn(Optional.of(user));
 
         LoginRequest loginRequest = new LoginRequest("username", "password");

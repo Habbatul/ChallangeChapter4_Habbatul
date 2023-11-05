@@ -134,10 +134,6 @@ public class UserControllerTest {
         roles.add(Roles.builder().roleName(ERole.CUSTOMER).build());
         user.setRoles(roles);
 
-        //skenario repository untuk mengembalikan user diatas
-        when(userRepository.save(user)).thenReturn(user);
-        userRepository.save(user);
-
         when(userRepository.findUserByUsername(Mockito.anyString())).thenReturn(Optional.of(user));
 
         LoginRequest loginRequest = new LoginRequest("username", "password");

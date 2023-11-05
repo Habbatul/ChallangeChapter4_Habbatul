@@ -156,11 +156,6 @@ public class OrderControllerTest {
         mySet.add(Roles.builder().roleName(ERole.CUSTOMER).build());
         user.setRoles(mySet);
 
-        //buat repository mock nya
-        when(userRepository.save(user)).thenReturn(user);
-        //simpan user sehingga mendapat role
-        userRepository.save(user);
-
         when(userRepository.findUserByUsername(Mockito.anyString())).thenReturn(Optional.of(user));
 
         LoginRequest loginRequest = new LoginRequest("username", "password");
