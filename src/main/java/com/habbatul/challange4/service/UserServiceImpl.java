@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
             log.info("User berhasil diupdate");
             return toUserResponse(oldUser);
         } else {
-            log.error("User tidak ditemukan");
+            log.error("User tidak ditemukan.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User tidak ditemukan");
         }
     }

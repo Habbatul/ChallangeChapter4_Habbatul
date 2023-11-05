@@ -72,7 +72,7 @@ public class MerchantServiceImpl implements MerchantService {
             log.info("Merchant berhasil diupdate : {}", merchant.getMerchantName());
             return merchantResponses.get(0);
         } else {
-            log.error("Merchant tidak ditemukan");
+            log.error("Merchant tidak ditemukan.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Merchant tidak ditemukan");
         }
 

@@ -3,7 +3,6 @@ package com.habbatul.challange4.controller;
 import com.habbatul.challange4.model.requests.OrderRequest;
 import com.habbatul.challange4.model.responses.OrderResponse;
 import com.habbatul.challange4.model.responses.WebResponse;
-import com.habbatul.challange4.security.JwtUtil;
 import com.habbatul.challange4.service.OrderService;
 import com.habbatul.challange4.utils.AuthExtractor;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +36,7 @@ public class OrderController {
     public ResponseEntity<WebResponse<OrderResponse>> createOrder(HttpServletRequest request,
                                                                   @RequestBody OrderRequest orderRequest) {
 
-        String username = authExtractor.ExtractorUsernameFromHeaderCookie(request);
+        String username = authExtractor.extractorUsernameFromHeaderCookie(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 WebResponse.<OrderResponse>builder()
@@ -64,7 +63,7 @@ public class OrderController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<WebResponse<List<OrderResponse>>> getUserOrders(HttpServletRequest request) {
-        String username = authExtractor.ExtractorUsernameFromHeaderCookie(request);
+        String username = authExtractor.extractorUsernameFromHeaderCookie(request);
 
         return ResponseEntity.ok(
                 WebResponse.<List<OrderResponse>>builder()
@@ -78,7 +77,7 @@ public class OrderController {
             produces = MediaType.APPLICATION_PDF_VALUE
     )
     public ResponseEntity<byte[]> makeOrder(HttpServletRequest request) throws JRException {
-        String username = authExtractor.ExtractorUsernameFromHeaderCookie(request);
+        String username = authExtractor.extractorUsernameFromHeaderCookie(request);
 
         return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=Order.pdf")

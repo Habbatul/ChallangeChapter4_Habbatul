@@ -105,7 +105,7 @@ public class ProductServiceImpl implements ProductService {
             log.info("Berhasil mengubah product {}", product.getProductName());
             return toProductResponse(oldProduct, oldProduct.getMerchant());
         } else {
-            log.error("Produk tidak ditemukan");
+            log.error("Produk tidak ditemukan.");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product tidak ditemukan");
         }
 

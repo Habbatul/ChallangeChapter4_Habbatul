@@ -33,8 +33,8 @@ class AuthEntryPointJwtTest {
 
         authEntryPointJwt.commence(request, response, authException);
 
-        assertEquals(response.getContentType(), "application/json");
-        assertEquals(response.getStatus(), HttpServletResponse.SC_UNAUTHORIZED);
+        assertEquals( "application/json",response.getContentType());
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
     }
 }
 

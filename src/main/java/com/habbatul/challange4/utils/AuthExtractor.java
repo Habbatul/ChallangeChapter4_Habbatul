@@ -18,7 +18,7 @@ public class AuthExtractor {
     @Autowired
     private JwtUtil jwtTokenUtil;
 
-    public String ExtractorUsernameFromHeaderCookie(HttpServletRequest request){
+    public String extractorUsernameFromHeaderCookie(HttpServletRequest request){
 
         String token = jwtTokenUtil.extractToken(request);
         if (token == null) {

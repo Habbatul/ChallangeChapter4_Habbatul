@@ -92,7 +92,7 @@ public class UserControllerTest {
                 .emailAddress("newuser@example.com")
                 .build();
 
-        when(authExtractor.ExtractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
+        when(authExtractor.extractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
         when(userService.updateUser(Mockito.anyString(), Mockito.any(UpdateUserRequest.class))).thenReturn(userResponse);
 
         UpdateUserRequest updateUserRequest = UpdateUserRequest.builder()
@@ -113,7 +113,7 @@ public class UserControllerTest {
         // Buat token untuk otorisasi
         String token = loginFirst();
 
-        when(authExtractor.ExtractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
+        when(authExtractor.extractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
         Mockito.doNothing().when(userService).deleteUser(Mockito.anyString());
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/user")

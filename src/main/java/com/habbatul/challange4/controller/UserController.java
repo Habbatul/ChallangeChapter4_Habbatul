@@ -45,7 +45,7 @@ public class UserController {
                                                                 @RequestBody UpdateUserRequest user) {
 
         //olah request untuk mendapatkan username cookie atau header
-        String username = authExtractor.ExtractorUsernameFromHeaderCookie(request);
+        String username = authExtractor.extractorUsernameFromHeaderCookie(request);
 
         return ResponseEntity.ok(WebResponse.<UserResponse>builder()
                 .data(userService.updateUser(username, user))
@@ -58,9 +58,9 @@ public class UserController {
     )
     public ResponseEntity<WebResponse<String>> deleteUser(HttpServletRequest request) {
         //olah request untuk mendapatkan username cookie atau header
-        //String username = authExtractor.ExtractorUsernameFromHeaderCookie(request);
+        //String username = authExtractor.extractorUsernameFromHeaderCookie(request);
 
-        userService.deleteUser(authExtractor.ExtractorUsernameFromHeaderCookie(request));
+        userService.deleteUser(authExtractor.extractorUsernameFromHeaderCookie(request));
         return ResponseEntity.ok(WebResponse.<String>builder().data("OK").build());
     }
 

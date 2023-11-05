@@ -70,7 +70,7 @@ public class OrderControllerTest {
                 .pembeliName("newuser")
                 .build();
 
-        when(authExtractor.ExtractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
+        when(authExtractor.extractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
         when(orderService.createOrder(Mockito.anyString(), Mockito.any(OrderRequest.class))).thenReturn(orderResponse);
 
         OrderRequest orderRequest = OrderRequest.builder()
@@ -98,7 +98,7 @@ public class OrderControllerTest {
 
         List<OrderResponse> orderResponses = new ArrayList<>();
 
-        when(authExtractor.ExtractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
+        when(authExtractor.extractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
         when(orderService.getOrderByUser(Mockito.anyString())).thenReturn(orderResponses);
 
         when(orderService.getOrderAll()).thenReturn(orderResponses);
@@ -118,7 +118,7 @@ public class OrderControllerTest {
         // Simulasikan data yang akan dikembalikan oleh orderService
         List<OrderResponse> orderResponses = new ArrayList<>();
 
-        when(authExtractor.ExtractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
+        when(authExtractor.extractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
         when(orderService.getOrderByUser(Mockito.anyString())).thenReturn(orderResponses);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/order")
@@ -136,7 +136,7 @@ public class OrderControllerTest {
         //pakai byte kosong karena emang ga ada filenya
         byte[] pdfBytes = new byte[0];
 
-        when(authExtractor.ExtractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
+        when(authExtractor.extractorUsernameFromHeaderCookie(Mockito.any())).thenReturn("newuser");
         when(orderService.printOrder(Mockito.anyString())).thenReturn(pdfBytes);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/order/print")

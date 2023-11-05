@@ -217,8 +217,8 @@ class OrderServiceTest {
         assertNotNull(response);
         assertEquals(1, response.size());
 
-        assertEquals(response.get(0).getDestinationAddress(), "TestAddresses1");
-        assertEquals(response.get(0).getCompleted(), OrderStatus.COMPLETE);
+        assertEquals("TestAddresses1", response.get(0).getDestinationAddress());
+        assertEquals(OrderStatus.COMPLETE, response.get(0).getCompleted());
 
 
         verify(orderRepository, times(1)).findOrdersByUserUsername(username);
