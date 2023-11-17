@@ -32,14 +32,14 @@ public class OrderSchedulerService {
     @Scheduled(cron = "0 0 13 * * *")
     @Transactional
     public void remindLunch() {
-        log.info("Ingatkan makan siang");
+        log.info("Promo 1");
     }
 
     //blueprint bila butuh scheduler tiap waktu makan malam/ jam 20.00
     @Scheduled(cron = "0 0 20 * * *")
     @Transactional
     public void remindDinner() {
-        log.info("Ingatkan makan malam");
+        log.info("Promo 2");
     }
 
 }
