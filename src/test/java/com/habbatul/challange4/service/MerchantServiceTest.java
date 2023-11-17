@@ -128,7 +128,6 @@ class MerchantServiceTest {
     @Test
     void testEditStatusWhenMerchantNotFound() {
         UpdateMerchantRequest request = UpdateMerchantRequest.builder()
-                .merchantLocation("UpdatedLocation")
                 .open(MerchantStatus.CLOSED)
                 .build();
 

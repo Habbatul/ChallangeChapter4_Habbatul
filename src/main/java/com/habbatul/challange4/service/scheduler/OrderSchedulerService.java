@@ -25,7 +25,6 @@ public class OrderSchedulerService {
     @Transactional
     public void deleteCompleteOrder() {
         log.info("Penghapusan berjalan");
-        // Logika yang akan dijalankan sesuai dengan jadwal
         orderRepository.deleteAllByCompleted(OrderStatus.COMPLETE);
     }
 
