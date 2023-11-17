@@ -4,18 +4,39 @@ GET http://localhost:8080/merchant
 ### Menambahkan merchant
 POST http://localhost:8080/merchant
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJpbmdvIiwiaWF0IjoxNzAwMjA4MDI4LCJleHAiOjE3MDAyMjYwMjh9.7BOPDSlSHyQl_KO9AveVYGfMdCfCwpBD1Kqr3QV2O7ckhF6aQj76j78B7iPT804LHruLq9bT8PNuuUHJ6vPM5g
 
 {
-  "merchantName": "merchant1",
+  "merchantName": "Disana",
   "merchantLocation": "Jalan Kenangan",
-  "open": "CLOSED"
+  "open": "OPEN"
 }
 
+### Menambahkan merchant
+POST http://localhost:8080/merchant/async
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJpbmdvIiwiaWF0IjoxNzAwMjA4MDI4LCJleHAiOjE3MDAyMjYwMjh9.7BOPDSlSHyQl_KO9AveVYGfMdCfCwpBD1Kqr3QV2O7ckhF6aQj76j78B7iPT804LHruLq9bT8PNuuUHJ6vPM5g
+
+{
+  "merchantName": "Disana",
+  "merchantLocation": "Jalan Kenangan",
+  "open": "OPEN"
+}
 <> 2023-10-11T005557.201.json
 
 ### Edit status merchant buka/tutup
-PUT http://localhost:8080/merchant/merchant1
+PUT http://localhost:8080/merchant/string
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJpbmdvIiwiaWF0IjoxNzAwMjA4MDI4LCJleHAiOjE3MDAyMjYwMjh9.7BOPDSlSHyQl_KO9AveVYGfMdCfCwpBD1Kqr3QV2O7ckhF6aQj76j78B7iPT804LHruLq9bT8PNuuUHJ6vPM5g
+
+{
+  "open": "OPEN"
+}
+
+### Edit status merchant buka/tutup
+PUT http://localhost:8080/merchant/async/string
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJpbmdvIiwiaWF0IjoxNzAwMjA4MDI4LCJleHAiOjE3MDAyMjYwMjh9.7BOPDSlSHyQl_KO9AveVYGfMdCfCwpBD1Kqr3QV2O7ckhF6aQj76j78B7iPT804LHruLq9bT8PNuuUHJ6vPM5g
 
 {
   "open": "OPEN"
@@ -75,9 +96,10 @@ DELETE http://localhost:8080/product/9b3403f7-31ce-42a6-af65-6fcd11d72ebc
 GET http://localhost:8080/product?page=5
 
 ### Membuat pesanan
-POST http://localhost:8080/order/
+POST http://localhost:8080/order
 Content-Type: application/json
 username: user1
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJpbmciLCJpYXQiOjE3MDAyMzIzMDEsImV4cCI6MTcwMDI1MDMwMX0.6sTCvfHK04vfNIup8AAZi-lEMRcGtUC1TzTOXPG74B_096RQcP5BFM0KoYRMzBBSlbH1HjeFYlJZwyKhGnVQwg
 
 {
   "destinationAddress": "Magelang, Mertoyudan, Kalinegoro",
@@ -100,14 +122,44 @@ username: user1
   ]
 }
 
+### Membuat pesanan
+POST http://localhost:8080/order/async
+Content-Type: application/json
+username: user1
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJpbmciLCJpYXQiOjE3MDAwNjkyNDQsImV4cCI6MTcwMDA4NzI0NH0.rf_hDTjT_2meG-9lvFjvG_Bn5McsYG4_Es1eKEH4ioBxgNO11-6v3pwkbuw1JkhvSpZ4S9lKXTCkfDcWGrrGQQ
+
+{
+  "destinationAddress": "Magelang, Mertoyudan, Kalinegoro",
+  "completed": "INCOMPLETE",
+  "detailOrder": [
+    {
+      "quantity": 3,
+      "productName": "string"
+    },
+    {
+      "quantity": 2,
+      "totalPrice": 10000.0,
+      "productName": "stringg"
+    },
+    {
+      "quantity": 3,
+      "totalPrice": 15000.0,
+      "productName": "strong"
+    }
+  ]
+}
+
 ### Menampilkan semua pesanan
 GET http://localhost:8080/order/admin
 Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzYW1hd2EiLCJpYXQiOjE2OTg2OTQ2ODgsImV4cCI6MTY5ODcxMjY4OH0.BJT_Tl_VqCARv5ZkEn2nlvDZCE7EI-3zdx5Gm57B9dPwCYf_rUY4FlR8YQ9eaABEOPV7ouMT3JAYlcCd0I79Lw
 
 ### Menampilkan pesanan
 GET http://localhost:8080/order/
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzYW1hd2EiLCJpYXQiOjE2OTg2OTQ2ODgsImV4cCI6MTY5ODcxMjY4OH0.BJT_Tl_VqCARv5ZkEn2nlvDZCE7EI-3zdx5Gm57B9dPwCYf_rUY4FlR8YQ9eaABEOPV7ouMT3JAYlcCd0I79Lw
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzdHJpbmciLCJpYXQiOjE3MDAwNjYyMjgsImV4cCI6MTcwMDA4NDIyOH0.30KwgK1zv6qZPLlJ9QPrH6Fc7NJQWZeq8FehfsPW_rWUt8FsPe1_uTjbrJauZ8UNTICuNtZbitOh9Lz4nejnQQ
 
 ### Print Order
 POST http://localhost:8080/order/print/
 username: user1
+
+###
+POST http://localhost:8080/auth/signup

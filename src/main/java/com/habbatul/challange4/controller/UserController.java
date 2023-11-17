@@ -23,18 +23,19 @@ public class UserController {
     @Autowired
     private AuthExtractor authExtractor;
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Menambahkan user (sementara saya tidak hapus)")
-    @PostMapping(value = "/user",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<WebResponse<UserResponse>> addUser(@RequestBody CreateUserRequest user) {
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(WebResponse.<UserResponse>builder()
-                .data(userService.addUser(user))
-                .build());
-    }
+//   pakai /sigin di AuthController
+//    @ResponseStatus(HttpStatus.CREATED)
+//    @Operation(summary = "Menambahkan user (sementara saya tidak hapus)")
+//    @PostMapping(value = "/user",
+//            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = MediaType.APPLICATION_JSON_VALUE
+//    )
+//    public ResponseEntity<WebResponse<UserResponse>> addUser(@RequestBody CreateUserRequest user) {
+//
+//        return ResponseEntity.status(HttpStatus.CREATED).body(WebResponse.<UserResponse>builder()
+//                .data(userService.addUser(user))
+//                .build());
+//    }
 
     @Operation(summary = "Mengupdate user (berdasarkan username JWTtoken bisa dari cookies atau header Authorization)")
     @PutMapping(value = "/user",

@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateMerchantRequest {
-    private String merchantLocation;
     private MerchantStatus open;
 }

@@ -1,5 +1,6 @@
 package com.habbatul.challange4.controller;
 
+
 import com.habbatul.challange4.model.requests.CreateProductRequest;
 import com.habbatul.challange4.model.requests.UpdateProductRequest;
 import com.habbatul.challange4.model.responses.ProductPaginationResponse;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.CompletableFuture;
 
 
 @RestController
@@ -32,6 +35,22 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(WebResponse.<ProductResponse>builder()
                 .data(productService.addProduct(createProductRequest))
                 .build());
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Menambahkan product dengan metode Asynchronous")
+    @PostMapping(
+            value = "/product/async",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<WebResponse<String>> createMerchantAsync(
+            @RequestBody CreateProductRequest createProductRequest) {
+
+        productService.addProductAsync(createProductRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(WebResponse.<String>builder()
+                        .data("Sukses")
+                        .build());
     }
 
     @Operation(summary = "Mengupdate detail produk")

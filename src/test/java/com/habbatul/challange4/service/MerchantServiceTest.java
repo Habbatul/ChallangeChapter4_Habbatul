@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -36,6 +37,26 @@ class MerchantServiceTest {
         Mockito.reset(merchantRepository);
     }
 
+
+    @Test
+    public void testAddMerchantAsync() {
+        CreateMerchantRequest request = new CreateMerchantRequest();
+        request.setMerchantName("TestMerchant");
+        request.setMerchantLocation("TestLocation");
+        request.setOpen(MerchantStatus.OPEN);
+
+        //methdo async
+        CompletableFuture<MerchantResponse> futureMerchant = merchantService.addMerchantAsync(request);
+
+        //memastikan eksekusi tidak diblokir
+        assertFalse(futureMerchant.isDone());
+
+        //tunggu operasi asynchronous (gunakan metode join untuk menunggu selesai)
+        MerchantResponse merchantResponse = futureMerchant.join();
+
+        assertTrue(futureMerchant.isDone());
+        assertNotNull(merchantResponse);
+    }
 
     @Test
     void testAddMerchant() {

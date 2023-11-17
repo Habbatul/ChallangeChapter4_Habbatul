@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RestController
@@ -34,7 +35,6 @@ public class MerchantController {
                     .build());
     }
 
-
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Menambahkan merchant")
     @PostMapping(
@@ -50,6 +50,21 @@ public class MerchantController {
                     .build());
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Menambahkan merchant dengan metode Asynchronous")
+    @PostMapping(
+            value = "/merchant/async",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<WebResponse<String>> createMerchantAsync(
+            @RequestBody CreateMerchantRequest createMerchantRequest) {
+        merchantService.addMerchantAsync(createMerchantRequest);
+        return
+                ResponseEntity.status(HttpStatus.CREATED).body(WebResponse.<String>builder()
+                        .data("Sukses")
+                        .build());
+    }
 
     @Operation(summary = "Edit status merchant buka/tutup")
     @PutMapping(
@@ -64,6 +79,22 @@ public class MerchantController {
         return ResponseEntity.ok().body(WebResponse.<MerchantResponse>builder()
                 .data(merchantService.editStatus(merchantName, updateMerchantRequest))
                 .build());
+    }
+
+    @Operation(summary = "Edit status merchant buka/tutup dengan metode Asynchronous")
+    @PutMapping(
+            value = "/merchant/async/{merchantName}",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE
+    )
+    public  ResponseEntity<WebResponse<String>> editMerchantAsync(
+            @PathVariable String merchantName,
+            @RequestBody UpdateMerchantRequest updateMerchantRequest) {
+
+        merchantService.editMerchantAsync(merchantName, updateMerchantRequest);
+        return ResponseEntity.ok().body(WebResponse.<String>builder()
+                        .data("Sukses")
+                        .build());
     }
 
 

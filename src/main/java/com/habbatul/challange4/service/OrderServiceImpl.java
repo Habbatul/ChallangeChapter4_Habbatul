@@ -15,9 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,6 +28,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,7 +47,25 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     ProductRepository productRepository;
 
-    //  public OrderResponse createOrder(Order order, List<OrderDetail> orderDetail, User user)
+    @Autowired
+    TaskExecutor asyncTaskExecutor;
+
+    @Async
+    @Transactional
+    @Override
+    public CompletableFuture<OrderResponse> createOrderAsync(String username, OrderRequest orderReq) {
+        return CompletableFuture.supplyAsync(() -> {
+//            try {
+//                Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+            log.info("ini running pada thread : {}", Thread.currentThread().getName());
+            return this.createOrder(username, orderReq);
+        }, asyncTaskExecutor);
+    }
+
+    @Transactional
     @Override
     public OrderResponse createOrder(String username, OrderRequest orderReq) {
 
@@ -183,9 +204,8 @@ public class OrderServiceImpl implements OrderService {
         return toOrderResponse(uniqueOrders);
     }
 
-
+    @Transactional
     @Override
-    @Transactional(readOnly = true)
     public byte[] printOrder(String username) throws JRException {
         log.debug("Service printOrder dijalankan");
 
@@ -230,19 +250,10 @@ public class OrderServiceImpl implements OrderService {
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
                 new JRBeanCollectionDataSource(orderDetailList));
 
+        orderRepository.updateCompletedStatus(orderPage.getContent().get(0).getOrderId());
+
         //cara ini berarti kembalian nya byte[] nanti dikonversi pakek ContentType("application/pdf") & Header("Content-Disposition", "attachment; filename=StructOrder.pdf");
         return JasperExportManager.exportReportToPdf(jasperPrint);
 
     }
 }
-
-
-//pada diatas klo percobaan response endpoint pdf gagal pakai lagi ubah controller jadi kembalian json lagi
-////        Ingat Ubah kembali fungsi menjadi kembalian string kalo pakek cara simple
-////        terlalu pakem variableny (cara simple)
-//        String path = "C:\\Users\\Axioo Pongo\\Downloads";
-//        String pdfPath = path + "\\Order.pdf";
-////        Export ke pdf kalo pakek yang variable pakem tadi untuk generate file (cara simple)
-//        JasperExportManager.exportReportToPdfFile(jasperPrint, pdfPath);
-//        return "Berhasil menyimpan pada path "+pdfPath";
-

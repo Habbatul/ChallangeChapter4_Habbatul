@@ -10,16 +10,20 @@ import com.habbatul.challange4.repository.MerchantRepository;
 import com.habbatul.challange4.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -33,6 +37,24 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     MerchantRepository merchantRepository;
 
+    @Autowired
+    TaskExecutor asyncTaskExecutor;
+
+    @Async
+    @Transactional
+    @Override
+    public CompletableFuture<ProductResponse> addProductAsync(CreateProductRequest createProductRequest) {
+        return CompletableFuture.supplyAsync(() -> {
+//            try {
+//                Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+            return this.addProduct(createProductRequest);
+        }, asyncTaskExecutor);
+    }
+
+    @Transactional
     @Override
     public ProductResponse addProduct(CreateProductRequest createProductRequest) {
         Product product = Product.builder()
@@ -77,6 +99,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    @Transactional
     @Override
     public ProductResponse updateProduct(UpdateProductRequest updateReq, String productCode) {
         Product product = Product.builder()
@@ -111,6 +134,7 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
+    @Transactional
     @Override
     public void deleteProduct(String productCode) {
         log.debug("Menjalankan service deleteProduct, kode");
@@ -139,6 +163,7 @@ public class ProductServiceImpl implements ProductService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductPaginationResponse showProduct(Integer page) {
         log.debug("Menjalankan service showProduct");

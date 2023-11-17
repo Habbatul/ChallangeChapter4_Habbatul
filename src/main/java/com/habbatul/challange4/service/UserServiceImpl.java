@@ -1,7 +1,6 @@
 package com.habbatul.challange4.service;
 
 import com.habbatul.challange4.entity.User;
-import com.habbatul.challange4.model.requests.CreateUserRequest;
 import com.habbatul.challange4.model.requests.UpdateUserRequest;
 import com.habbatul.challange4.model.responses.UserResponse;
 import com.habbatul.challange4.repository.UserRepository;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -25,27 +25,27 @@ public class UserServiceImpl implements UserService {
     PasswordEncoder passwordEncoder;
 
 
-
     //Nanti dulu hapusnya, eman-eman karena bikinnya mikir keras uehe
-    @Override
-    public UserResponse addUser(CreateUserRequest userReq) {
-        log.debug("Menjalankan service addUser");
-
-        User user = User.builder()
-                .username(userReq.getUsername())
-                .emailAddress(userReq.getEmailAddress())
-                .password(passwordEncoder.encode(userReq.getPassword()))
-                .build();
-
-        if (!userRepository.existsByUsername(user.getUsername())) {
-            userRepository.save(user);
-            log.info("user berhasil ditambahkan");
-            return toUserResponse(user);
-        } else {
-            log.error("User telah ada");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User telah didaftarkan");
-        }
-    }
+//    @Transactional
+//    @Override
+//    public UserResponse addUser(CreateUserRequest userReq) {
+//        log.debug("Menjalankan service addUser");
+//
+//        User user = User.builder()
+//                .username(userReq.getUsername())
+//                .emailAddress(userReq.getEmailAddress())
+//                .password(passwordEncoder.encode(userReq.getPassword()))
+//                .build();
+//
+//        if (!userRepository.existsByUsername(user.getUsername())) {
+//            userRepository.save(user);
+//            log.info("user berhasil ditambahkan");
+//            return toUserResponse(user);
+//        } else {
+//            log.error("User telah ada");
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User telah didaftarkan");
+//        }
+//    }
 
     private UserResponse toUserResponse(User user) {
         log.debug("Memberikan response user");
@@ -56,6 +56,7 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @Transactional
     @Override
     public UserResponse updateUser(String username, UpdateUserRequest userReq) {
         log.debug("Menjalankan service updateUser");
@@ -82,6 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    @Transactional
     @Override
     public void deleteUser(String username) {
         log.debug("Menjalankan service deleteUser");

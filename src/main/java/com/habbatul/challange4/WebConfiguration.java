@@ -6,21 +6,44 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.SpringDocUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 //konfigurasi spring mvc untuk melakukan rewrite root ke swagger-ui/index.html
+
+@EnableAsync
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
+
+    //task eksekutor untuk async
+    @Bean(name = "asyncTaskExecutor")
+    public TaskExecutor asyncTaskExecutor() {
+//        return new SimpleAsyncTaskExecutor();
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5); //jumlah core/inti dari thread yang tetap ada dalam pool
+        executor.setMaxPoolSize(10); //jumlah maksimum thread dalam pool
+        executor.setQueueCapacity(50); //kapasitas antrean yang digunakan jika jumlah thread lebih dari coreThread
+        executor.setThreadNamePrefix("QolbiThread-"); //nama thread
+        executor.initialize();
+        return executor;
+    }
+
 
     //melakukan redirect ke root ke swagger open api
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("redirect:/swagger-ui/index.html");
     }
+
 
     //melakukan custom title ddan deskripsi
     @Bean
@@ -49,8 +72,8 @@ public class WebConfiguration implements WebMvcConfigurer {
                                 "<br><br> <b>CUSTOMER</b> : <br>" +
                                 "PUT" +
                                 "/user<br>" +
-                                "POST" +
-                                "/user (sementara tidak saya hapus)<br>" +
+//                                "POST" +
+//                                "/user (sementara tidak saya hapus)<br>" +
                                 "DELETE" +
                                 "/user<br>" +
                                 "GET" +

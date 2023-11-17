@@ -8,8 +8,12 @@ import com.habbatul.challange4.model.responses.ProductPaginationResponse;
 import com.habbatul.challange4.model.responses.ProductResponse;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface ProductService {
+    //async
+    CompletableFuture<ProductResponse> addProductAsync(CreateProductRequest createProductRequest);
+
     ProductResponse addProduct(CreateProductRequest createProductRequest);
     ProductResponse updateProduct(UpdateProductRequest updateProductRequest, String productCode);
     void deleteProduct(String productCode);
