@@ -1,6 +1,5 @@
 package com.habbatul.challange4.service;
 
-import com.habbatul.challange4.model.requests.CreateUserRequest;
 import com.habbatul.challange4.model.requests.UpdateUserRequest;
 import com.habbatul.challange4.model.responses.UserResponse;
 
