@@ -1,11 +1,13 @@
 package com.habbatul.challange4.service;
 
-import com.habbatul.challange4.entity.User;
-import com.habbatul.challange4.model.UserResponse;
+import com.habbatul.challange4.model.requests.CreateUserRequest;
+import com.habbatul.challange4.model.requests.UpdateUserRequest;
+import com.habbatul.challange4.model.responses.UserResponse;
 
 public interface UserService {
-    UserResponse addUser(User user);
-    UserResponse updateUser(User user);
-    void deleteUser(User user);
+    //addUser ada di authservice dengan nama method registerUser
+//    UserResponse addUser(CreateUserRequest user);
+    UserResponse updateUser(String username, UpdateUserRequest userReq);
+    void deleteUser(String username);
 
 }

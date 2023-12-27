@@ -1,16 +1,8 @@
-# ChallangeChapter4_Habbatul
+# ChallangeChapter7_Habbatul
 
-### - Target Challange
+### - Desain Rencana Microservice
+<img src="Microservice Design.png">
 
-1. Membuat fitur sesuai spesifikasi pada challange
-2. Membuat ERD
-3. Melakukan CRUD pada database
-4. Melakukan operasi dasar SQL
-5. Membuat project menggunakan Spring Boot dengan Pagination
-6. Menggunakan Java Logging
-
-### - Desain ERD (belum terwujud pada entity)
+### - Desain ERD
 <img src="erd_new.png">
 
-### - Hasil unit test berhasil mencapai coverage 100% untuk case negatif dan positif
-<img src="hasil_unittest.png">

@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,6 +28,11 @@ public class Merchant {
 
     @Enumerated(EnumType.STRING)
     private MerchantStatus open;
+
+    //untuk proses bisnis sementara pesan cascade = CascadeType.REMOVE ke orderDetail
+    //karena order masih ambigu, apakah order yang completed akan menjadi log history atau tidak
+    @OneToMany(mappedBy = "merchant", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<Product> products;
 }
 
 

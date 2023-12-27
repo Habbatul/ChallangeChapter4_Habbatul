@@ -3,19 +3,32 @@ package com.habbatul.challange4.service;
 import com.habbatul.challange4.entity.Order;
 import com.habbatul.challange4.entity.OrderDetail;
 import com.habbatul.challange4.entity.Product;
-import com.habbatul.challange4.entity.User;
-import com.habbatul.challange4.exception.CustomException;
-import com.habbatul.challange4.model.OrderDetailResponse;
-import com.habbatul.challange4.model.OrderResponse;
+import com.habbatul.challange4.model.requests.OrderDetailRequest;
+import com.habbatul.challange4.model.requests.OrderRequest;
+import com.habbatul.challange4.model.responses.OrderDetailResponse;
+import com.habbatul.challange4.model.responses.OrderResponse;
 import com.habbatul.challange4.repository.OrderDetailRepository;
 import com.habbatul.challange4.repository.OrderRepository;
 import com.habbatul.challange4.repository.ProductRepository;
+import com.habbatul.challange4.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,52 +42,96 @@ public class OrderServiceImpl implements OrderService {
     OrderDetailRepository orderDetailRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     ProductRepository productRepository;
 
+    @Autowired
+    TaskExecutor asyncTaskExecutor;
+
+    @Async
+    @Transactional
     @Override
-    public OrderResponse createOrder(Order order, List<OrderDetail> orderDetail, User user) {
+    public CompletableFuture<OrderResponse> createOrderAsync(String username, OrderRequest orderReq) {
+        return CompletableFuture.supplyAsync(() -> {
+//            try {
+//                Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+            log.info("ini running pada thread : {}", Thread.currentThread().getName());
+            return this.createOrder(username, orderReq);
+        }, asyncTaskExecutor);
+    }
+
+    @Transactional
+    @Override
+    public OrderResponse createOrder(String username, OrderRequest orderReq) {
+
+
         log.debug("Service createOrder dijalankan");
 
-        orderRepository.save(order);
+        //buat order tanpa order detail
+        Order order = Order.builder()
+                .user(
+                        userRepository.findUserByUsername(username).orElseThrow(() ->
+                                new ResponseStatusException(HttpStatus.BAD_REQUEST, "User tidak ada"))
+                )
+                .orderTime(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
+                .destinationAddress(orderReq.getDestinationAddress())
+                .completed(orderReq.getCompleted())
+                .build();
+
+        //buat order detailnya
+        List<OrderDetail> orderDetail = convertToOrderDetail(orderReq.getDetailOrder());
+        orderDetail.forEach(orderDetails -> orderDetails.setOrder(order));
 
         List<OrderDetail> orderDetailFinalisasi = new ArrayList<>(orderDetail.stream()
-
-                /*
-                kumpulkan elemen stream ke map lalu nanti kalo ada konflik dua order detail
-                dengan kunci yang sama maka gabungkan tapi perbarui quantity dan totalprice nya.
-                existingOrderdetail untuk penanda sudah ada di map, newOrder sebagai isi yang
-                baru (untuk digbungkan nantinya diambil nilainya untuk ditambahkan ke existing
-                */
-
                 .collect(Collectors.toMap(
-                        OrderDetail::getProduct, //key nya
+                        OrderDetail->OrderDetail.getProduct().getProductName(), //key nya
                         orderDetails -> orderDetails, //value
                         (existingOrderDetail, newOrderDetail) -> { //merge nya
 
                             existingOrderDetail.setQuantity(
                                     existingOrderDetail.getQuantity() + newOrderDetail.getQuantity()
                             );
-
                             existingOrderDetail.setTotalPrice(
                                     existingOrderDetail.getTotalPrice() + newOrderDetail.getTotalPrice()
                             );
-
                             return existingOrderDetail;
                         }
                 )).values());
 
+        //set orderDetail ke order
+        order.setOrderDetails(orderDetailFinalisasi);
+
+        orderRepository.save(order);
         orderDetailRepository.saveAll(orderDetailFinalisasi);
-        log.info("Order dan Detail Order berhasil disimpan : OrderTime({})", order.getOrderTime());
-
-        order.setOrderDetails(new ArrayList<>(orderDetailFinalisasi));
-
         List<OrderResponse> orderResponses = toOrderResponse(Collections.singletonList(order));
         return orderResponses.get(0); //karena hanya dapat menambah satu per service, index pertama
     }
 
 
+    private List<OrderDetail> convertToOrderDetail(List<OrderDetailRequest> orderDetailResponses) {
+        return orderDetailResponses.stream()
+                .map(orderDetailResponse -> {
+                    Product product = productRepository.
+                            findByProductName(orderDetailResponse.getProductName())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                                    "Product Tidak ada"));
+
+                    return OrderDetail.builder()
+                            .product(product)
+                            .quantity(orderDetailResponse.getQuantity())
+                            .totalPrice(product.getPrice() * orderDetailResponse.getQuantity())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+
     private List<OrderResponse> toOrderResponse(List<Order> orders) {
-        log.debug("Response orders ditampilkan : size({})", orders.size());
         return orders.stream()
                 .map(order -> {
                     List<OrderDetailResponse> tempOrderDetail = order.getOrderDetails().stream()
@@ -93,7 +150,7 @@ public class OrderServiceImpl implements OrderService {
                     return OrderResponse.builder()
                             .detailOrder(tempOrderDetail)
                             .orderTime(order.getOrderTime())
-                            .completed(order.getCompleted().toString())
+                            .completed(order.getCompleted())
                             .destinationAddress(order.getDestinationAddress())
                             .pembeliName(order.getUser().getUsername())
                             .build();
@@ -101,18 +158,16 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
     }
 
-    //izin kak, dia error :
-    //org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
-    //saya cari solusi suruh pakek Transactional
     @Transactional(readOnly = true)
     @Override
-    public List<OrderResponse> getOrderByUser(User user) {
+    public List<OrderResponse> getOrderByUser(String username) {
         log.debug("Service getOrderByUser dijalankan");
 
-        List<Order> orders = orderRepository.findOrdersByUserId(user.getUserId());
+        List<Order> orders = orderRepository.findOrdersByUserUsername(username);
         if (orders.isEmpty()) {
             log.error("Order pada tabel kosong");
-            throw new CustomException("Order Tidak ditemukan");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Username tidak terdaftar atau belum membuat order");
         } else {
             log.info("Item order berhasil didapatkan");
         }
@@ -126,9 +181,6 @@ public class OrderServiceImpl implements OrderService {
         return toOrderResponse(uniqueOrders);
     }
 
-    //izin kak, dia error :
-    //org.hibernate.LazyInitializationException: failed to lazily initialize a collection of role
-    //saya cari solusi suruh pakek Transactional
     @Transactional(readOnly = true)
     @Override
     public List<OrderResponse> getOrderAll() {
@@ -138,7 +190,7 @@ public class OrderServiceImpl implements OrderService {
 
         if (orders.isEmpty()) {
             log.error("Order pada tabel kosong");
-            throw new CustomException("Order Tidak ditemukan");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order Tidak ditemukan");
         } else {
             log.info("Item order berhasil didapatkan");
         }
@@ -152,4 +204,56 @@ public class OrderServiceImpl implements OrderService {
         return toOrderResponse(uniqueOrders);
     }
 
+    @Transactional
+    @Override
+    public byte[] printOrder(String username) throws JRException {
+        log.debug("Service printOrder dijalankan");
+
+        //Penerapan untuk melimit satu saja data yang diambil
+        Page<Order> orderPage = orderRepository.findOneOrdersByUserUsername(username, PageRequest.of(0, 1));
+        if (orderPage.getContent().isEmpty() || orderPage.getContent().get(0) == null) {
+            log.info("Username tidak terdaftar atau belum memesan, username : {}", username);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username tidak terdaftar atau belum memesan");
+        }
+        Order order = orderPage.getContent().get(0);
+
+        List<OrderDetailResponse> orderDetailList = order.getOrderDetails().stream()
+                .map(orderDetail -> {
+                    Product product = orderDetail.getProduct();
+                    return OrderDetailResponse.builder()
+                            .totalPrice(orderDetail.getTotalPrice())
+                            .quantity(orderDetail.getQuantity())
+                            .productName(product.getProductName())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        String usernames = order.getUser().getUsername();
+        String destinationAddress = order.getDestinationAddress();
+
+        Double totalOrderPrice = orderDetailList.stream().mapToDouble(OrderDetailResponse::getTotalPrice).sum();
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("username", usernames);
+        parameters.put("destinationAddress", destinationAddress);
+        parameters.put("totalOrderPrice", totalOrderPrice);
+
+        //tambahan baru untuk parameter directory gambar, sebelumnya langsung bisa tapi untuk dijadikan byte tidak memungkinkan langsung bila pakai JasperExportManager.exportReportToPdf(jasperPrint); harus pakai JasperExportManager.exportReportToPdfFile
+        parameters.put("bgDirectory", getClass().getResourceAsStream("/tulisan.png"));
+
+
+        InputStream jrxmlInputStream = getClass().getResourceAsStream("/makeOrder.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlInputStream);
+
+
+        //Jasperprint digunakan untuk generating file serta melakukan transfer ke parameter (baik datasource/mapParameter)
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters,
+                new JRBeanCollectionDataSource(orderDetailList));
+
+        orderRepository.updateCompletedStatus(orderPage.getContent().get(0).getOrderId());
+
+        //cara ini berarti kembalian nya byte[] nanti dikonversi pakek ContentType("application/pdf") & Header("Content-Disposition", "attachment; filename=StructOrder.pdf");
+        return JasperExportManager.exportReportToPdf(jasperPrint);
+
+    }
 }

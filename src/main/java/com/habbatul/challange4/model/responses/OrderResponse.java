@@ -1,5 +1,6 @@
-package com.habbatul.challange4.model;
+package com.habbatul.challange4.model.responses;
 
+import com.habbatul.challange4.enums.OrderStatus;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 public class OrderResponse {
     private LocalDateTime orderTime;
     private String destinationAddress;
-    private String completed;
+    private OrderStatus completed;
     private List<OrderDetailResponse> detailOrder;
     private String pembeliName;
 }

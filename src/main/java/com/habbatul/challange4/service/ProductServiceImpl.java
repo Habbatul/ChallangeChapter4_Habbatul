@@ -2,21 +2,29 @@ package com.habbatul.challange4.service;
 
 import com.habbatul.challange4.entity.Merchant;
 import com.habbatul.challange4.entity.Product;
-import com.habbatul.challange4.exception.CustomException;
-import com.habbatul.challange4.model.ProductPaginationResponse;
-import com.habbatul.challange4.model.ProductResponse;
+import com.habbatul.challange4.model.requests.CreateProductRequest;
+import com.habbatul.challange4.model.requests.UpdateProductRequest;
+import com.habbatul.challange4.model.responses.ProductPaginationResponse;
+import com.habbatul.challange4.model.responses.ProductResponse;
+import com.habbatul.challange4.repository.MerchantRepository;
 import com.habbatul.challange4.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,21 +33,58 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     ProductRepository productRepository;
 
+
+    @Autowired
+    MerchantRepository merchantRepository;
+
+    @Autowired
+    TaskExecutor asyncTaskExecutor;
+
+    @Async
+    @Transactional
     @Override
-    public ProductResponse addProduct(Product product, Merchant merchant) {
+    public CompletableFuture<ProductResponse> addProductAsync(CreateProductRequest createProductRequest) {
+        return CompletableFuture.supplyAsync(() -> {
+//            try {
+//                Thread.sleep(5000);
+//            } catch (InterruptedException e) {
+//                Thread.currentThread().interrupt();
+//            }
+            return this.addProduct(createProductRequest);
+        }, asyncTaskExecutor);
+    }
+
+    @Transactional
+    @Override
+    public ProductResponse addProduct(CreateProductRequest createProductRequest) {
+        Product product = Product.builder()
+                .productName(createProductRequest.getProductName())
+                .price(createProductRequest.getPrice())
+                .build();
+
+        Merchant merchant = new Merchant();
+        merchant.setMerchantName(createProductRequest.getMerchantName());
+
         log.debug("Menjalankan service addProduct");
 
-        if (!productRepository.existsByProductName(product.getProductName())) {
+        //jadi set merchant pakek parameter merchant kalo ga ada dia ngethrow, jadi santuy
+        Merchant merchantFound = merchantRepository.findByMerchantName(merchant.getMerchantName())
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Merchant tidak ditemukan"));
+        product.setMerchant(merchantFound);
 
+        if (!productRepository.existsByProductName(product.getProductName())) {
+            //kondisional sementara
+            //tambah waktunya
             if (product.getAddedTime() == null)
                 product.setAddedTime(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS));
+            //tambah merchant dari parameter
 
             productRepository.save(product);
             log.info("Berhasil menyimpan product");
-            return toProductResponse(product, merchant);
+            return toProductResponse(product, merchantFound);
         } else {
             log.error("Product sudah ada");
-            throw new CustomException("Product is exist!!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product sudah ada");
         }
     }
 
@@ -47,69 +92,92 @@ public class ProductServiceImpl implements ProductService {
     private ProductResponse toProductResponse(Product product, Merchant merchant) {
         log.debug("Memberikan response product");
         return ProductResponse.builder()
+                .productCode(product.getProductCode())
                 .productName(product.getProductName())
                 .price(product.getPrice())
                 .merchantName(merchant != null ? merchant.getMerchantName() : null)
                 .build();
     }
 
+    @Transactional
     @Override
-    public ProductResponse updateProduct(Product product) {
+    public ProductResponse updateProduct(UpdateProductRequest updateReq, String productCode) {
+        Product product = Product.builder()
+                .productCode(productCode)
+                .productName(updateReq.getProductName())
+                .price(updateReq.getPrice())
+                .build();
+        Merchant merchant = new Merchant();
+        merchant.setMerchantName(updateReq.getMerchantName());
+
 
         Optional<Product> productByID = productRepository.findById(product.getProductCode());
         if (productByID.isPresent()) {
             Product oldProduct = productByID.get();
             oldProduct.setProductName(product.getProductName() != null ? product.getProductName() : oldProduct.getProductName());
             oldProduct.setPrice(product.getPrice() != null ? product.getPrice() : oldProduct.getPrice());
-            oldProduct.setMerchant(product.getMerchant() != null ? product.getMerchant() : oldProduct.getMerchant());
+
+            //logic sementara
+            if(merchant.getMerchantName() != null){
+                Merchant merchantByName = merchantRepository.findByMerchantName(merchant.getMerchantName())
+                        .orElse(null);
+                oldProduct.setMerchant(merchantByName);
+            }
+
             productRepository.save(oldProduct);
             log.info("Berhasil mengubah product {}", product.getProductName());
             return toProductResponse(oldProduct, oldProduct.getMerchant());
         } else {
-            log.error("Produk tidak ditemukan");
-            throw new CustomException("Product Not found");
+            log.error("Produk tidak ditemukan.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product tidak ditemukan");
         }
 
     }
 
+    @Transactional
     @Override
-    public void deleteProduct(Product product) {
-        log.debug("Menjalankan service deleteProduct");
-        if (productRepository.existsById(product.getProductCode())) {
-            productRepository.deleteById(product.getProductCode());
-            log.info("Berhasil melakukan delete {}", product.getProductName());
+    public void deleteProduct(String productCode) {
+        log.debug("Menjalankan service deleteProduct, kode");
+        if (productRepository.existsById(productCode)){
+            productRepository.deleteById(productCode);
+            log.info("Berhasil melakukan delete");
         } else {
             log.error("Product tidak ditemukan");
-            throw new CustomException("Product Not found");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Product tidak ditemukan");
         }
     }
 
-    private List<ProductPaginationResponse> toProductPaginationResponse(Page<Product> productPage) {
+    private ProductPaginationResponse toProductPaginationResponse(Page<Product> productPage) {
         log.debug("Memberikan response pagination");
 
         List<Product> productResponses = productPage.getContent();
-        List<ProductPaginationResponse> paginationResponses = new ArrayList<>();
 
-        for (Product product : productResponses) {
-            paginationResponses.add(ProductPaginationResponse.builder()
-                    .productsResponse(Collections.singletonList(toProductResponse(product, product.getMerchant())))
-                    .productCurrentPage(productPage.getNumber() + 1)
-                    .productTotalPage(productPage.getTotalPages())
-                    .build());
-        }
+        List<ProductResponse> productResponseList = productResponses.stream()
+                .map(product -> toProductResponse(product, product.getMerchant()))
+                .collect(Collectors.toList());
 
-        return paginationResponses;
+        return ProductPaginationResponse.builder()
+                .productsResponse(productResponseList)
+                .productCurrentPage(productPage.getNumber() + 1)
+                .productTotalPage(productPage.getTotalPages())
+                .build();
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<ProductPaginationResponse> showProduct(Integer page) {
+    public ProductPaginationResponse showProduct(Integer page) {
         log.debug("Menjalankan service showProduct");
 
         page -= 1; //halaman asli dari index 0
         //sementara size nya 1
-        Pageable halaman = PageRequest.of(page, 1);
+        Pageable halaman = PageRequest.of(page, 3);
 
-        Page<Product> productPage = productRepository.findAllProductsJoinMerchant(halaman);
+        Page<Product> productPage = productRepository.findAllProductsJoinMerchant(halaman)
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Data tidak ditemukan"));
+
+        if (productPage.getContent().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Halaman tidak memiliki item");
+        }
 
         log.info("Berhasil mendapatkan item Product");
 
