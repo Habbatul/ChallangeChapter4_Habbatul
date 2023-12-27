@@ -1,6 +1,5 @@
 package com.habbatul.challange4.controller;
 
-import com.habbatul.challange4.model.requests.CreateUserRequest;
 import com.habbatul.challange4.model.requests.UpdateUserRequest;
 import com.habbatul.challange4.model.responses.UserResponse;
 import com.habbatul.challange4.model.responses.WebResponse;
@@ -8,7 +7,6 @@ import com.habbatul.challange4.service.UserService;
 import com.habbatul.challange4.utils.AuthExtractor;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

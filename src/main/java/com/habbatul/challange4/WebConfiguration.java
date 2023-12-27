@@ -110,7 +110,7 @@ public class WebConfiguration implements WebMvcConfigurer {
                                 "<li>[Linkedin Profile](https://www.linkedin.com/in/habbatul/)</li>" +
                                 "<ul>")
                         .version("1.0.0"))
-                .components(new Components().addSecuritySchemes("BearerToken", securityScheme))
+                .components(new Components().addSecuritySchemes("Authorization", securityScheme))
                 .addSecurityItem(securityRequirement);
     }
 }
