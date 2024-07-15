@@ -2,7 +2,7 @@
 
 <center><img src="https://mediabangsa.co.id/wp-content/uploads/2023/07/Binar_-_Logo_warna.original.png" width="300"></center>
 
-Saya melaksanakan program Kampus Merdeka MSIB, Study Independen di Binar selama kurang lebih 5 bulan. Pada Binar Academy saya mempelajari pemrograman Java sebagai dasar untuk membuat Restful API menggunakan Spring Framework / Spring Boot. Di  sini saya mempelajari mengenai cara membuat Restful API dengan menggunakan spring framework, mempelajari dasar dari docker dan deployment, mempelajari bahasa java termasuk fitur-fitur yang tersedia di bahasa ini (stream, data structure, generic, asynchronous, etc), dan mempelajari penggunaan third party dalam membantu pengembangan backend menggunakan Spring.
+<p align="justify"> Saya melaksanakan program Kampus Merdeka MSIB, Study Independen di Binar selama kurang lebih 5 bulan. Pada Binar Academy saya mempelajari pemrograman Java sebagai dasar untuk membuat Restful API menggunakan Spring Framework / Spring Boot. Di  sini saya mempelajari mengenai cara membuat Restful API dengan menggunakan spring framework, mempelajari dasar dari docker dan deployment, mempelajari bahasa java termasuk fitur-fitur yang tersedia di bahasa ini (stream, data structure, generic, asynchronous, etc), dan mempelajari penggunaan third party dalam membantu pengembangan backend menggunakan Spring.</p>
 
 > Repository ini merupakan akumulasi hasil proyek challange 1-7 pada Studi Independent di Binar Academy. 
 
