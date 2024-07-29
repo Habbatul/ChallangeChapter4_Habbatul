@@ -24,29 +24,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-
-    //Nanti dulu hapusnya, eman-eman karena bikinnya mikir keras uehe
-//    @Transactional
-//    @Override
-//    public UserResponse addUser(CreateUserRequest userReq) {
-//        log.debug("Menjalankan service addUser");
-//
-//        User user = User.builder()
-//                .username(userReq.getUsername())
-//                .emailAddress(userReq.getEmailAddress())
-//                .password(passwordEncoder.encode(userReq.getPassword()))
-//                .build();
-//
-//        if (!userRepository.existsByUsername(user.getUsername())) {
-//            userRepository.save(user);
-//            log.info("user berhasil ditambahkan");
-//            return toUserResponse(user);
-//        } else {
-//            log.error("User telah ada");
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User telah didaftarkan");
-//        }
-//    }
-
     private UserResponse toUserResponse(User user) {
         log.debug("Memberikan response user");
 

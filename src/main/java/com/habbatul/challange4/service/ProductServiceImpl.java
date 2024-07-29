@@ -45,11 +45,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public CompletableFuture<ProductResponse> addProductAsync(CreateProductRequest createProductRequest) {
         return CompletableFuture.supplyAsync(() -> {
-//            try {
-//                Thread.sleep(5000);
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
             return this.addProduct(createProductRequest);
         }, asyncTaskExecutor);
     }

@@ -55,11 +55,6 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public CompletableFuture<OrderResponse> createOrderAsync(String username, OrderRequest orderReq) {
         return CompletableFuture.supplyAsync(() -> {
-//            try {
-//                Thread.sleep(5000);
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
             log.info("ini running pada thread : {}", Thread.currentThread().getName());
             return this.createOrder(username, orderReq);
         }, asyncTaskExecutor);

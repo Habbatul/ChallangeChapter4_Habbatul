@@ -34,11 +34,6 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public CompletableFuture<MerchantResponse> addMerchantAsync(CreateMerchantRequest createMerchantRequest) {
         return CompletableFuture.supplyAsync(() -> {
-//            try {
-//                Thread.sleep(5000);
-//            } catch (InterruptedException e) {
-//                Thread.currentThread().interrupt();
-//            }
            log.info("ini running pada thread : {}", Thread.currentThread().getName());
            return this.addMerchant(createMerchantRequest);
         }, asyncTaskExecutor);
